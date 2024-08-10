@@ -1,0 +1,1 @@
+This is going to be a test of reading a text file into the eof.exe. I will now have numbers: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9!
