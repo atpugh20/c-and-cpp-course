@@ -33,9 +33,22 @@ list *arrayToList(int d[], int size) {
     return head;
 }
 
+void printList(list *h, char *title) {
+    printf("%s\n", title);
+    while (h != NULL) {
+        printf("%d: ", h -> data);
+        h = h -> next;
+    }
+}
+
 // MAIN //
 
 int main(void) {
-
+    list listOfInt;
+    list* head = NULL;
+    int data[6] = {2,3,5,7,8,9};
+    head = arrayToList(data, 6);
+    printList(head, "data[6] made into a 6 element list");
+    printf("\n\n");
     return 0;
 }
