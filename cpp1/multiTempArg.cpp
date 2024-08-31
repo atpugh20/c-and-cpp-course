@@ -17,8 +17,9 @@ void copy(const T1 source[], T2 destination[], int size) {
 
 int main() {
     int size = 5;
-    int nums[size] = {1,2,3,4,5};
+    int nums[] = {1, 2, 3, 4, 5};
     double decimals[size];
+
     copy(nums, decimals, size);
 
     // print each new double to console
