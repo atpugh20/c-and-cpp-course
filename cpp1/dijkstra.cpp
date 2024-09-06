@@ -8,6 +8,7 @@
 #include <vector>
 #include <climits>
 
+const int MAX_DIST = 100000;
 const int NODES = 25;
 
 class Node {
@@ -20,7 +21,7 @@ class Node {
         Node* prev; // previous node
 
         // Constructor
-        Node(int n, int dist = INT_MAX, Node* prev = nullptr) :
+        Node(int n, int dist = MAX_DIST, Node* prev = nullptr) :
             n(n), dist(dist), prev(prev) {}
 };
 
@@ -97,121 +98,26 @@ class Dijkstra {
         Dijkstra() {
             graph.generate_edges();
         }
+        // Destructor
         ~Dijkstra() {
-            for (auto p : unvisited) delete p;
-            for (auto p : visited) delete p;
+            for (Node* node : unvisited) delete node;
+            for (Node* node : visited) delete node;
         }
 
+        // Methods
 
         void reset_vectors() {
-            for (auto p : unvisited) delete p;
-            for (auto p : visited) delete p;
+            /* Releases all nodes from memory, clears the vectors,
+             * then restores the unvisited vector back to default */
+
+            for (Node* node : unvisited) delete node;
+            for (Node* node : visited) delete node;
+            unvisited.clear();
+            visited.clear();
 
             for (int i = 0; i < NODES; i++) {
                 unvisited.push_back(new Node(i));    
             }
-        }
-        
-        void sort_unvisited() {
-            /* Sorts the unvisited nodes by distance, from shortest to largest */
-
-            for (int i = 0; i < unvisited.size() - 1; i++) {
-                for (int j = 0; j < unvisited.size() - 1; j++) {
-                    if (unvisited.at(j)->dist > unvisited.at(j + 1)->dist) {
-                        Node* temp = unvisited.at(j);
-                        unvisited.at(j) = unvisited.at(j+1);
-                        unvisited.at(j+1) = temp;
-                    } 
-                }
-            }
-        }
-
-        bool is_visited(int n) {
-            /* Checks if a node with an integer label of 'n' is 
-             * located in the visited nodes vector */
-
-            bool vis = false;
-            if (!visited.size()) return vis;
-            for (int i = 0; i < visited.size(); i++) {
-                if (visited.at(i)->n == n) vis = true;
-            }
-            return vis;
-        }
-
-        void check_neighbors(Node* current_node, int cn) {
-            /* Get the neighbors of the current node, and update
-            their node distances according to the graph matrix */
-            
-            for (int i = 0; i < graph.matrix[cn].size(); i++) {
-                if (!is_visited(i)) {
-                    int distance = graph.matrix[cn][i];
-                    if (distance != 0) {
-                        for (int j = 0; j < unvisited.size(); j++) {
-                            if (i == unvisited.at(j)->n) {
-                                int sum = distance + current_node->dist;
-                                // Only update if the new distance is smaller than what is was before
-                                if (sum < unvisited.at(j)->dist) {
-                                    unvisited.at(j)->dist = distance + current_node->dist;
-                                    unvisited.at(j)->prev = current_node;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } 
-
-        void get_shortest_path(int start, int end) {
-            /* Sweeps through all the nodes and their paths, starting from 'start'
-             * until the shortest distance to 'end' is found.  */
-            reset_vectors();
-            unvisited.at(start)->dist = 0;
-            
-            // Keep repeating as long as there are unvisited nodes
-            while (unvisited.size()) {
-                
-                // Get the closest node
-                sort_unvisited();
-                Node* current_node = unvisited.at(0);
-                int cn = current_node->n; 
-                                
-                // Set current node as visited
-                unvisited.erase(unvisited.begin());
-                visited.insert(visited.begin(), current_node);
-                if (cn == end) break; // Exit function if final node
-                check_neighbors(current_node, cn);
-            }
-            if (visited.at(0)->dist == INT_MAX) {
-                std::cout << "No paths found to " << start << " from " << end << "!\n\n";
-            } else {
-                Node* shortest_path = visited.at(0);
-                std::cout << "\n\n-----Shortest Path-----\n\n";
-                print_path(shortest_path);
-                std::cout << "\n\nPath total distance: " << shortest_path->dist << "\n\n";
-                std::cout << "-----------------------\n\n";
-            }
-        }
-
-        void average_shortest_path() {
-            double sum = 0.0;
-            int total_paths = 0;
-            reset_vectors();
-            unvisited.at(0)->dist = 0;
-            
-            // Calculate all shortest paths
-            while (unvisited.size()) {
-                sort_unvisited();
-                Node* current_node = unvisited.at(0);
-                int cn = current_node->n;
-                int d = current_node->dist;
-                if (d != 0 && d < 100000 && d > -100000) {
-                   sum+=d;
-                }
-                unvisited.erase(unvisited.begin());
-                visited.insert(visited.begin(), current_node);
-                check_neighbors(current_node, cn);
-            }
-            std::cout << sum;
         }
 
         void print_path(Node* path) {
@@ -225,6 +131,97 @@ class Dijkstra {
             }
             std::cout << p->n;
         }
+        
+        void sort_unvisited() {
+            /* Sorts the unvisited nodes by distance, from shortest to largest */
+
+            for (int i = 0; i < unvisited.size() - 1; i++) {
+                for (int j = 0; j < unvisited.size() - 1; j++) {
+                    if (unvisited.at(j)->dist > unvisited.at(j + 1)->dist) {
+                        // swaps nodes if the current node is larger than the next
+                        Node* temp = unvisited.at(j);
+                        unvisited.at(j) = unvisited.at(j+1);
+                        unvisited.at(j+1) = temp;
+                    } 
+                }
+            }
+        }
+
+        bool is_visited(int n) {
+            /* Checks if a node with an integer label of 'n' is 
+             * located in the visited nodes vector */
+
+            bool v = false;
+            if (!visited.size()) return v;
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited.at(i)->n == n) v = true;
+            }
+            return v;
+        }
+
+        void check_neighbors(Node* current_node, int cn) {
+            /* Get the neighbors of the current node, and update
+            their node distances according to the graph matrix */
+            
+            for (int i = 0; i < graph.matrix[cn].size(); i++) {
+                int distance = graph.matrix[cn][i];
+                // if node is not visited and there is a path between
+                if (!is_visited(i) && distance != 0) {
+                    for (int j = 0; j < unvisited.size(); j++) {
+                        if (i == unvisited.at(j)->n) {
+                            int sum = distance + current_node->dist;
+                            // Only update if the new distance is smaller than what is was before
+                            if (sum < unvisited.at(j)->dist) {
+                                unvisited.at(j)->dist = sum;
+                                unvisited.at(j)->prev = current_node;
+                            }
+                        }
+                    }
+                }
+            }
+        } 
+
+        void get_shortest_path(int start, int end) {
+            /* Sweeps through all the nodes and their paths, starting from 'start'
+             * until the shortest distance to 'end' is found.  */
+            unvisited.at(start)->dist = 0;
+            
+            // Keep repeating as long as there are unvisited nodes
+            while (unvisited.size()) {
+
+                // Get the closest node
+                sort_unvisited();
+                Node* current_node = unvisited.at(0);
+                int cn = current_node->n; 
+                                
+                // Set current node as visited
+                unvisited.erase(unvisited.begin());
+                visited.insert(visited.begin(), current_node);
+                if (cn == end) break; // Exit function if final node
+                check_neighbors(current_node, cn);
+            }
+            if (visited.at(0)->dist == MAX_DIST) {
+                std::cout << "No paths found to " << start << " from " << end << "!\n\n";
+            } else {
+                Node* shortest_path = visited.at(0);
+                std::cout << "\n\n-----Shortest Path-----\n\n";
+                print_path(shortest_path);
+                std::cout << "\n\nPath total distance: " << shortest_path->dist << "\n\n";
+                std::cout << "-----------------------\n\n";
+            }
+            reset_vectors();
+        }
+
+        void average_shortest_path() {
+            /* Finds all shortest paths, then prints 
+             * out the average shortest path size */
+
+            std::cout << "Will get average soon\n\n";  
+            // Calculate all shortest paths
+            reset_vectors();
+        }
+
+        
 };
 
 void input_nodes(int& start, int& end) {
@@ -240,7 +237,7 @@ int main() {
     Dijkstra* finder = new Dijkstra;
     std::vector<Node*> paths;
     Node* shortest_path;
-    int choice;
+    int choice = 0;
     int start, end;
 
     std::cout << "\n\n--------------------------------\n";
