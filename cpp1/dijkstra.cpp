@@ -5,79 +5,21 @@
 #include <cstdlib>
 #include <ctime>
 #include <array>
+#include <vector>
+#include <climits>
+#include <typeinfo>
 
 const int NODES = 9;
 
 class Node {
     public:
-        int d;
+        int n;
         int dist;
-        Node* next;
         Node* prev;
 
         // Constructor
-        Node(int d, int dist = 0, Node* next = nullptr, Node* prev = nullptr) :
-            d(d), dist(dist), next(next), prev(prev) {}
-};
-
-class Path {
-    /* A path is a linked list that connects
-     * the origin to the destination */
-    
-    public:
-        Node* head;
-        Node* cursor;
-        
-        Path() : head(nullptr), cursor(nullptr) {}
-        ~Path() {
-            for (cursor = head; cursor != nullptr;) {
-                cursor = head->next;
-                delete head;
-                head = cursor;
-            }
-            std::cout << "Destroyed Path.";
-        }
-        void prepend(int n, int dist_to_next = 0) {
-            /* Adds a node to the beginning of the list */
-            if (head == nullptr) {
-                cursor = head = new Node(n, 0, head);
-            } else {
-                int tot_dist;
-                if (head->next == nullptr) { 
-                    tot_dist = dist_to_next;
-                } else {
-                    tot_dist = dist_to_next + head->dist;
-                }
-                head = new Node (n, tot_dist, head);
-                head->next->prev = head;
-            }
-
-        }
-        
-        void print() {
-            /* Prints the linked list an its entirety to the console */
-
-            Node* h = head;
-            while (h != nullptr) {
-                std::cout << h->dist << ", ";
-                h = h->next;
-            }
-            std::cout << "###" << std::endl;
-        }
-
-        void print_reverse() {
-            Node* h = head;
-            while (h->next != nullptr) {
-                h = h->next;
-            }
-
-            while (h != nullptr) {
-                std::cout << h->d << ", ";
-                h = h->prev;
-            }
-            std::cout << "###\n";
-        }
-        
+        Node(int n, int dist = INT_MAX, Node* prev = nullptr) :
+            n(n), dist(dist), prev(prev) {}
 };
 
 class Graph {
@@ -116,13 +58,15 @@ class Graph {
  
             for (int i = -1; i < NODES; i++) {
                 for (int j = -1; j < NODES; j++) {
-                    if (i == -1) std::cout << j + 1;
-                    else if (j == -1) std::cout << i + 1;
+                    if (i == -1 && j == -1) std::cout << ' ';
+                    else if (i == -1) std::cout << j;
+                    else if (j == -1) std::cout << i;
                     else std::cout << matrix[i][j];
                     std::cout << " ";
                 }
                 std::cout << "\n";
             }
+            std::cout << "\n";
         }
 };
 
@@ -133,56 +77,101 @@ class Dijkstra {
 
     public:
         Graph graph;
+        std::vector<Node*> unvisited;
+        std::vector<Node*> visited;
+        std::vector<Node*> neighbors;
 
-        // An std::array with length NODES starting from 0. 
-        // Being a non-negative number means that the 
-        // coresponding node still needs to be checked
-        std::array<int, NODES> unvisited;
-        std::array<int, NODES> neighbors;
         // Constructor
         Dijkstra() {
             graph.generate_edges();
             graph.print();
             for (int i = 0; i < NODES; i++) {
-                unvisited[i] = i;
+                unvisited.push_back(new Node(i));    
             }
         }
         
-        bool nodes_remaining() {
-            /* Checks if there are any unvisited nodes. 
-             * An index with -1 as its value indicates 
-             * that that node has been visited */
+        void sort_unvisited() {
+            /* Sorts the unvisited nodes by distance, from shortest to largest */
 
-            bool remaining = false;
-            for (int i = 0; i < NODES; i++) {
-                // -1 means it has been checked
-                if (unvisited[i] != -1) {
-                    remaining = true;
-                    break;
+            for (int i = 0; i < unvisited.size() - 1; i++) {
+                for (int j = 0; j < unvisited.size() - 1; j++) {
+                    if (unvisited.at(j)->dist > unvisited.at(j + 1)->dist) {
+                        Node* temp = unvisited.at(j);
+                        unvisited.at(j) = unvisited.at(j+1);
+                        unvisited.at(j+1) = temp;
+                    } 
                 }
             }
-            return remaining;
         }
 
-        void get_shortest_path() {
+        bool is_visited(int n) {
+            bool vis = false;
+            if (!visited.size()) return vis;
+            for (int i = 0; i < visited.size(); i++) {
+                if (visited.at(i)->n == n) vis = true;
+            }
+            return vis;
         }
 
+        std::vector<Node*> get_shortest_path(int start, int end) {
+            /* Sweeps through all the nodes and their paths, starting from 'start'
+             * until the shortest distance to 'end' is found.  */
+
+            // set start distance to 0 and start the loop
+            unvisited.at(start)->dist = 0;
+            
+            while (unvisited.size()) {
+                // get closest node and set it to current
+                sort_unvisited();
+                for (int i = 0; i < unvisited.size(); i++) {
+                    std::cout << unvisited.at(i)->n << " ";
+                }
+                std::cout << '\n';
+
+                Node* current_node = unvisited.at(0);
+                int cn = current_node->n; // current node identifier
+                
+                // set current node as visited
+                unvisited.erase(unvisited.begin());
+                visited.insert(visited.begin(), current_node);
+
+                if (cn == end) return visited; // reaches final node
+                
+                // Get the neighbors of the current node, and update
+                // their node distances according to the graph matrix
+                for (int i = 0; i < graph.matrix[cn].size(); i++) {
+                    if (!is_visited(i)) {
+                        int distance = graph.matrix[cn][i];
+                        if (distance != 0) {
+                            for (int j = 0; j < unvisited.size(); j++) {
+                                if (i == unvisited.at(j)->n) {
+                                    int sum = distance + current_node->dist;
+                                    if (sum < unvisited.at(j)->dist) {
+                                        unvisited.at(j)->dist = distance + current_node->dist;
+                                        unvisited.at(j)->prev = current_node;
+                                    }
+                                    //std::cout << unvisited.at(j)->n << ": " << unvisited.at(j)->dist << "\n";
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return visited;
+        }
 };
 
 
 int main() {
     srand(time(0));
-    
-    //Path* path = new Path();
-    //for (int i = 0; i < 10; i++) {
-    //    path->prepend(i, 2);
-    //}
-    
     Dijkstra finder;
-    finder.get_shortest_path();
-    for (int i = 0; i < NODES; i++) {
-        std::cout << "\n" << finder.unvisited[i] << " ";
+    std::vector<Node*> shortest = finder.get_shortest_path(3, 8);
+    std::cout << shortest.at(0)->dist << "\n\n";
+    Node* path = shortest.at(0);
+    while (path != nullptr) {
+        std::cout << path->n << "->";
+        path = path->prev;
     }
-    //delete path;
 }
 
