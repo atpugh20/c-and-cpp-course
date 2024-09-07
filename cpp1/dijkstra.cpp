@@ -93,10 +93,13 @@ class Dijkstra {
         Graph graph;
         std::vector<Node*> unvisited;
         std::vector<Node*> visited;
+        float total_distance = 0.0f;
+        int total_paths = 0;
 
         // Constructor
         Dijkstra() {
             graph.generate_edges();
+            reset_vectors();
         }
         // Destructor
         ~Dijkstra() {
@@ -120,17 +123,7 @@ class Dijkstra {
             }
         }
 
-        void print_path(Node* path) {
-            /* Uses recursion to print the 'path' 
-             * node from the tail to the head */
-            
-            Node* p = path;
-            if (p->prev != nullptr) {
-                print_path(p->prev);
-                std::cout << "->";
-            }
-            std::cout << p->n;
-        }
+       
         
         void sort_unvisited() {
             /* Sorts the unvisited nodes by distance, from shortest to largest */
@@ -180,6 +173,18 @@ class Dijkstra {
                 }
             }
         } 
+        
+        void print_path(Node* path) {
+            /* Uses recursion to print the 'path' 
+             * node from the tail to the head */
+                
+            Node* p = path;
+            if (p->prev != nullptr) {
+                print_path(p->prev);
+                std::cout << "->";
+            }
+            std::cout << p->n;
+        }
 
         void get_shortest_path(int start, int end) {
             /* Sweeps through all the nodes and their paths, starting from 'start'
@@ -200,14 +205,18 @@ class Dijkstra {
                 if (cn == end) break; // Exit function if final node
                 check_neighbors(current_node, cn);
             }
-            if (visited.at(0)->dist == MAX_DIST) {
+            Node* path = visited.at(0);
+            if (path->dist == MAX_DIST) {
                 std::cout << "No paths found to " << start << " from " << end << "!\n\n";
             } else {
-                Node* shortest_path = visited.at(0);
-                std::cout << "\n\n-----Shortest Path-----\n\n";
-                print_path(shortest_path);
-                std::cout << "\n\nPath total distance: " << shortest_path->dist << "\n\n";
-                std::cout << "-----------------------\n\n";
+                std::cout << "\n\n-----Chosen-Path-Statistics-----\n\n";
+                print_path(path);
+                std::cout << "\n\nPath total distance: " << path->dist << "\n\n";
+                std::cout << "--------------------------------\n";
+            }
+            if (path->dist > 0 && path->dist != MAX_DIST) {
+                total_distance += path->dist;
+                total_paths++;
             }
             reset_vectors();
         }
@@ -215,10 +224,21 @@ class Dijkstra {
         void average_shortest_path() {
             /* Finds all shortest paths, then prints 
              * out the average shortest path size */
+            float average;
 
-            std::cout << "Will get average soon\n\n";  
-            // Calculate all shortest paths
-            reset_vectors();
+            for (int i = 0; i < NODES; i++) {
+                get_shortest_path(0, i);
+            }
+
+            if (total_paths > 0) {
+                average = total_distance / total_paths;
+                std::cout << "\nThe average path length is: " << average << ".\n\n";
+            } else {
+                std::cout << "Cannot divide by 0!\n"; 
+            }
+            
+            total_distance = 0.0f;
+            total_paths = 0;
         }
 
         
