@@ -9,7 +9,7 @@
 #include <climits>
 
 const int MAX_DIST = 100000;
-const int NODES = 25;
+const int NODES = 50;
 
 class Node {
     /* The basic unit of a path that will be 
@@ -53,7 +53,7 @@ class Graph {
                         matrix[i][j] = matrix[j][i]; // if path already created, copy it
                     } else {
                         // There is a 10% chance of generating an edge between 1-9
-                        if (rand() % 100 / 100.0 < 0.1) matrix[i][j] = rand() % 9 + 1;
+                        if (rand() % 100 / 100.0 < 0.2) matrix[i][j] = rand() % 9 + 1;
                         else matrix[i][j] = 0;
                     }
                 }
