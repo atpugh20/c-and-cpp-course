@@ -1,33 +1,40 @@
 #include <iostream>
 #include <vector>
 
-void print(std::vector<int> v) {
+template <class T>
+void print(std::vector<T> v) {
     std::cout << "[ "; 
-    for (int i = 0; i < v.size(); i++) {
-        std::cout << v.at(i) << " ";
+    for (T e : v) {
+        std::cout << e << " ";
     }
     std::cout << "]\n";
 }
 
 int main() {
-    std::vector<int> v1;
-    print(v1); 
+    std::vector<double> v1;
+    print(v1);
+
     v1.push_back(10);
     print(v1);
+
     v1.pop_back();
     print(v1);
+    
     v1.insert(v1.begin(), 5);
     print(v1);
+    
     v1.erase(v1.begin());
     print(v1);
+    
     v1.clear();
     print(v1);
-    for (int i = 0; i < 10; i++) {
+    
+    for (double i = 0.1; i < 10; i++) {
         v1.push_back(i);
     }
     print(v1);
 
-    for (int i = 0; i < 10; i++) {
+    for (double i = 0; i < 10; i++) {
         v1.insert(v1.begin(), i);
     }
     print(v1);
