@@ -13,7 +13,8 @@ void fill_graph(std::vector<std::vector<int>>& graph, int size) {
     /* Fills a matrix with edges. There is a 0.2 probability
      * that an edge, or a 1, will be generated. Otherwise, a
      * 0 will be filled into the index */
-
+    
+    graph.clear();
     for (int i = 0; i < size; i++) {
         std::vector<int> v;
         graph.push_back(v);
@@ -36,7 +37,7 @@ void print_graph(std::vector<std::vector<int>>& graph) {
 }
 
 int main() {
-    std::srand(time(0));
+    std::srand(std::time(0));
     std::vector<std::vector<int>> graph;
     const int edge_num = 20;
     
