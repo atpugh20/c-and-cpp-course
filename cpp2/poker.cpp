@@ -82,7 +82,7 @@ int main() {
     }
 
     for (Card c : deck) {
-        if (c.get_suit() == Suit::CLUBS) std::cout << c << "\n";
+        std::cout << c << "\n";
     }
 
     return 0;
