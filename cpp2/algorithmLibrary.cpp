@@ -16,7 +16,7 @@ int main() {
     sort(names, names+5);
     for (std::string name : names) {
         std::cout << name << '\n';
-    }
+    }  
 
     return 0;
 }
