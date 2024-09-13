@@ -16,7 +16,7 @@ class Node {
         // Constructor
         Node() : t_left(nullptr), t_right(nullptr), left(nullptr),
                  b_left(nullptr), b_right(nullptr), right(nullptr),
-                 color("grey") {}
+                 color("none") {}
 };  
 
 class Board {
@@ -44,16 +44,30 @@ class Board {
                 }
             }    
         }
+
+        void print() {
+            for (std::vector<Node*> row : graph) {
+                std::cout << '\n';
+                for (Node* node : row) {
+                    std::cout << " [";
+                    if (node->color == "none") std::cout << " ";
+                    else if (node->color == "red") std::cout << "X";
+                    else if (node->color == "blue") std::cout << "O";
+                    else std::cout << "?";
+                    std::cout << "] ";
+                } 
+            }
+        }
 };
 
 int main() {
     Board* board = new Board(5);
-    for (std::vector<Node*> row : board->graph) {
-        std::cout << '\n';
-        for (Node* node : row) {
-            std::cout << node->color << " ";
-        } 
-    }
+    board->graph.at(2).at(2)->color = "red";
+    board->graph.at(1).at(1)->color = "blue";
+    board->graph.at(1).at(2)->color = "blue";
+    board->graph.at(2).at(3)->color = "gibberish";
+
+    board->print();
 
     delete board;
     return 0;
