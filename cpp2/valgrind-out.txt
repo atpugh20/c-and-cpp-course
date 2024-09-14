@@ -1,0 +1,119 @@
+==108160== Memcheck, a memory error detector
+==108160== Copyright (C) 2002-2022, and GNU GPL'd, by Julian Seward et al.
+==108160== Using Valgrind-3.20.0-5147d671e4-20221024 and LibVEX; rerun with -h for copyright info
+==108160== Command: ./hex.exe
+==108160== Parent PID: 1786
+==108160== 
+--108160-- 
+--108160-- Valgrind options:
+--108160--    --leak-check=full
+--108160--    --show-leak-kinds=all
+--108160--    --track-origins=yes
+--108160--    --verbose
+--108160--    --log-file=valgrind-out.txt
+--108160-- Contents of /proc/version:
+--108160--   Linux version 6.8.11-amd64 (devel@kali.org) (x86_64-linux-gnu-gcc-13 (Debian 13.2.0-25) 13.2.0, GNU ld (GNU Binutils for Debian) 2.42) #1 SMP PREEMPT_DYNAMIC Kali 6.8.11-1kali2 (2024-05-30)
+--108160-- 
+--108160-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx
+--108160-- Page sizes: currently 4096, max supported 4096
+--108160-- Valgrind library directory: /usr/libexec/valgrind
+--108160-- Reading syms from /home/kali/Documents/GitHub/c-and-cpp-course/cpp2/hex.exe
+--108160-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--108160--   Considering /usr/lib/debug/.build-id/a9/700083811ae36d1017fe16ebe5657d59cdda0a.debug ..
+--108160--   .. build-id is valid
+--108160-- Reading syms from /usr/libexec/valgrind/memcheck-amd64-linux
+--108160--    object doesn't have a symbol table
+--108160--    object doesn't have a dynamic symbol table
+--108160-- Scheduler: using generic scheduler lock implementation.
+--108160-- Reading suppressions file: /usr/libexec/valgrind/default.supp
+==108160== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-108160-by-kali-on-???
+==108160== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-108160-by-kali-on-???
+==108160== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-108160-by-kali-on-???
+==108160== 
+==108160== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==108160== don't want to do, unless you know exactly what you're doing,
+==108160== or are doing some strange experiment):
+==108160==   /usr/bin/vgdb --pid=108160 ...command...
+==108160== 
+==108160== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==108160==   /path/to/gdb ./hex.exe
+==108160== and then give GDB the following command
+==108160==   target remote | /usr/bin/vgdb --pid=108160
+==108160== --pid is optional if only one valgrind process is running
+==108160== 
+--108160-- REDIR: 0x4023460 (ld-linux-x86-64.so.2:strlen) redirected to 0x580bda92 (???)
+--108160-- REDIR: 0x4021c40 (ld-linux-x86-64.so.2:index) redirected to 0x580bdaac (???)
+--108160-- Reading syms from /usr/libexec/valgrind/vgpreload_core-amd64-linux.so
+--108160--    object doesn't have a symbol table
+--108160-- Reading syms from /usr/libexec/valgrind/vgpreload_memcheck-amd64-linux.so
+--108160--    object doesn't have a symbol table
+==108160== WARNING: new redirection conflicts with existing -- ignoring it
+--108160--     old: 0x04023460 (strlen              ) R-> (0000.0) 0x580bda92 ???
+--108160--     new: 0x04023460 (strlen              ) R-> (2007.0) 0x04846da0 strlen
+--108160-- REDIR: 0x4021e60 (ld-linux-x86-64.so.2:strcmp) redirected to 0x4847ec0 (strcmp)
+--108160-- REDIR: 0x40212d0 (ld-linux-x86-64.so.2:mempcpy) redirected to 0x484bcb0 (mempcpy)
+--108160-- Reading syms from /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33
+--108160--    object doesn't have a symbol table
+--108160-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--108160--    object doesn't have a symbol table
+--108160-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--108160--   Considering /usr/lib/debug/.build-id/2e/01923fea4ad9f7fa50fe24e0f3385a45a6cd1c.debug ..
+--108160--   .. build-id is valid
+--108160-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--108160--   Considering /usr/lib/debug/.build-id/6c/771bfaca294a4e3d85ada43b358bf6b49dcd2a.debug ..
+--108160--   .. build-id is valid
+--108160-- REDIR: 0x4023600 (ld-linux-x86-64.so.2:strncmp) redirected to 0x48476f0 (strncmp)
+--108160-- REDIR: 0x4b9b870 (libc.so.6:strnlen) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b8f0 (libc.so.6:strpbrk) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b99a50 (libc.so.6:strcmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4bb0580 (libc.so.6:wcsnlen) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98c30 (libc.so.6:memset) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4bafdb0 (libc.so.6:wcslen) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4c14f80 (libc.so.6:__memcpy_chk) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98bb0 (libc.so.6:memrchr) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98250 (libc.so.6:memcpy@@GLIBC_2.14) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4baeb80 (libc.so.6:wcschr) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b99960 (libc.so.6:index) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b920 (libc.so.6:rindex) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4baec20 (libc.so.6:wcscmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98e50 (libc.so.6:stpncpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4bbb1e0 (libc.so.6:wmemchr) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b740 (libc.so.6:strncmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98eb0 (libc.so.6:strcasecmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9abd0 (libc.so.6:strcspn) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4bafbe0 (libc.so.6:wcscpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b998f0 (libc.so.6:strcat) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b650 (libc.so.6:strncasecmp_l) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b999d0 (libc.so.6:strchrnul) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98160 (libc.so.6:bcmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9ab60 (libc.so.6:strcpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98f40 (libc.so.6:strcasecmp_l) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b540 (libc.so.6:strlen) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b7d0 (libc.so.6:strncpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4c15090 (libc.so.6:__memmove_chk) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+==108160== WARNING: new redirection conflicts with existing -- ignoring it
+--108160--     old: 0x04b9ef20 (__memcpy_chk_sse2_un) R-> (2030.0) 0x0484bdb0 __memcpy_chk
+--108160--     new: 0x04b9ef20 (__memcpy_chk_sse2_un) R-> (2024.0) 0x0484b720 __memmove_chk
+--108160-- REDIR: 0x4b98de0 (libc.so.6:stpcpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98990 (libc.so.6:memmove) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b980e0 (libc.so.6:memchr) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9bac0 (libc.so.6:strspn) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b98aa0 (libc.so.6:mempcpy) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4b9b5c0 (libc.so.6:strncasecmp) redirected to 0x48371b0 (_vgnU_ifunc_wrapper)
+--108160-- REDIR: 0x4babda0 (libc.so.6:__strrchr_sse2) redirected to 0x48467e0 (__strrchr_sse2)
+--108160-- REDIR: 0x4ba5f10 (libc.so.6:__strlen_sse2) redirected to 0x4846ce0 (__strlen_sse2)
+--108160-- REDIR: 0x4b9e9a0 (libc.so.6:__memcmp_sse2) redirected to 0x484a340 (__memcmp_sse2)
+--108160-- REDIR: 0x4c71db0 (libc.so.6:__strncmp_sse42) redirected to 0x4847630 (__strncmp_sse42)
+--108160-- REDIR: 0x4b94710 (libc.so.6:malloc) redirected to 0x4840790 (malloc)
+--108160-- REDIR: 0x491b660 (libstdc++.so.6:operator new(unsigned long)) redirected to 0x4840f10 (operator new(unsigned long))
+--108160-- REDIR: 0x4b9ef30 (libc.so.6:memcpy@GLIBC_2.2.5) redirected to 0x4847ff0 (memcpy@GLIBC_2.2.5)
+--108160-- REDIR: 0x4919920 (libstdc++.so.6:operator delete(void*, unsigned long)) redirected to 0x4843a70 (operator delete(void*, unsigned long))
+--108160-- REDIR: 0x4b94dc0 (libc.so.6:free) redirected to 0x4843180 (free)
+==108160== 
+==108160== HEAP SUMMARY:
+==108160==     in use at exit: 0 bytes in 0 blocks
+==108160==   total heap usage: 206 allocs, 206 frees, 90,840 bytes allocated
+==108160== 
+==108160== All heap blocks were freed -- no leaks are possible
+==108160== 
+==108160== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
