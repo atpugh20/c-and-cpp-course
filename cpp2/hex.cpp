@@ -64,6 +64,8 @@ class Board {
              * '[O]' - Player 2
              * '[?]' - Incorrect color string (for debugging)
              */
+            std::cout << "\n\nRed (X): Top <-> Bottom\n";
+            std::cout << "Blue (O): Left <-> Right\n\n";
             for (int y = -1; y <= size; y++) {
                 for (int indent = 0; indent < y; indent++) std::cout << "  ";
                 for (int x = -1; x <= size; x++) {
@@ -96,6 +98,11 @@ class Board {
         }
 
         void get_user_move(std::string player_color) {
+            /** 
+             * This function allows the player to input a move, 
+             * checks if the input space is empty,
+             * then fills in the space with the appropriate color.
+             */
             int x;
             int y;
             while (true) {
@@ -109,21 +116,45 @@ class Board {
         }
 
         void get_cpu_move(std::string player_color) {
-            
+            int x;
+            int y;
+            while (true) {
+                x = (std::rand() / static_cast<float> (RAND_MAX)) * size;
+                y = (std::rand() / static_cast<float> (RAND_MAX)) * size;
+                if (node_is_empty(x, y)) break;
+            }
+            graph.at(y).at(x)->color = player_color;
         }
 
         bool node_is_empty(int x, int y) {
             /** 
              * Checks if the node at the selected coordinates it empty. 
-             * If yes return true, otherwise return false.
+             * If empty, return true. Otherwise, return false.
              */
-            bool empty = false;
             if (x >= 0 && y >= 0 && x < size && y < size) {
                 if (graph.at(y).at(x)->color == "none") {
-                    empty = true;
+                    return true;
                 }
             }
-            return empty;
+            return false;
+        }
+
+        bool spaces_remain() {
+            /**
+             * Checks if any nodes are unfilled. 
+             * If there is at least one space available, return true.
+             * Otherwise, return false.
+             */
+            for (std::vector<Node*> row : graph) {
+                for (Node* node : row) {
+                    if (node->color == "none") return true; 
+                }
+            }
+            return false;
+        }
+
+        bool check_for_winner(std::string color) {
+            return true;    
         }
 
     private:
@@ -175,14 +206,33 @@ std::ostream& operator<<(std::ostream& out, const Node* n) {
     return out;    
 }
 
+void print_title() {
+    std::cout << '\n';
+    std::cout << "-----------------------------------------------------------------------\n";
+    std::cout << "|                                                                     |\n";
+    std::cout << "|                                 HEX                                 |\n";
+    std::cout << "|                                                                     |\n";
+    std::cout << "-----------------------------------------------------------------------\n";
+}
+
 int main() {
     std::srand(std::time(0));
-
     Board* board = new Board(11);
+    std::string user_color = "red";
+    std::string cpu_color = "blue";
+    
+    print_title();
+    
+    // Game Loop
+    while (true) {
+        board->print();
+        board->get_user_move(user_color);
+        if (!board->spaces_remain()) break;
+        board->get_cpu_move(cpu_color);
+        if (!board->spaces_remain()) break;
+    }
+    
     board->print();
-    board->get_user_move("red");
-    board->print();
-
     delete board;
     return 0;
 }
