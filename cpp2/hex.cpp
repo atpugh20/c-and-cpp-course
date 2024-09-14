@@ -154,7 +154,12 @@ class Board {
         }
 
         bool check_for_winner(std::string color) {
-            return true;    
+            if (color == "red") {
+                for (Node* n : graph.at(0)) {
+                    std::cout << n;   
+                }
+            }
+            return true;
         }
 
     private:
@@ -227,9 +232,10 @@ int main() {
     while (true) {
         board->print();
         board->get_user_move(user_color);
-        if (!board->spaces_remain()) break;
-        board->get_cpu_move(cpu_color);
-        if (!board->spaces_remain()) break;
+        board->check_for_winner(user_color);
+//        if (!board->spaces_remain()) break;
+//        board->get_cpu_move(cpu_color);
+//        if (!board->spaces_remain()) break;
     }
     
     board->print();
