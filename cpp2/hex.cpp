@@ -20,6 +20,7 @@ class Node {
         int x;
         int y;
         std::string color;
+        bool visited;
         Node* t_left;
         Node* t_right;
         Node* left;
@@ -28,10 +29,19 @@ class Node {
         Node* b_right;
         
         // Constructor
-        Node(int x, int y) : x(x), y(y), color("none"),  
+        Node(int x, int y) : x(x), y(y), color("none"), visited(false), 
                              t_left(nullptr), t_right(nullptr), left(nullptr),
                              b_left(nullptr), b_right(nullptr), right(nullptr) {}
-};  
+}; 
+
+std::ostream& operator<<(std::ostream& out, const Node* n) {
+    /** 
+     * Overloads the << operator to be able to print a node to the console. 
+     */
+    out << "Coordinates: (" << n->x << ", " << n->y << "), ";
+    out << "Color: " << n->color;
+    return out;    
+}
 
 class Board {
     /** 
@@ -153,13 +163,53 @@ class Board {
             return false;
         }
 
-        bool check_for_winner(std::string color) {
-            if (color == "red") {
-                for (Node* n : graph.at(0)) {
-                    std::cout << n;   
+        bool check_for_winner(Node* n, std::string color) {
+            if (n->color == color && !n->visited) {
+                n->visited = true;
+                
+                // Checks for the win conditions
+                if (n->color == "red" && n->y == size - 1) return true;
+                if (n->color == "blue" && n->x == size - 1) return true;
+                
+                // Checks the neighbor nodes
+                if (n->right->color == color &&
+                    !n->right->visited) {
+                    check_for_winner(n->right, color);
+                }
+                if (n->b_right->color == color &&
+                    !n->b_right->visited) {
+                    check_for_winner(n->b_right, color);
+                }
+                if (n->t_right->color == color &&
+                    !n->t_right->visited) {
+                    check_for_winner(n->t_right, color);
+                }
+                if (n->b_left->color == color &&
+                    !n->b_left->visited) {
+                    check_for_winner(n->b_left, color);
+                }
+                if (n->t_left->color == color &&
+                    !n->t_left->visited) {
+                    check_for_winner(n->t_left, color);
+                }
+                if (n->left->color == color &&
+                    !n->left->visited) {
+                    check_for_winner(n->left, color);
                 }
             }
-            return true;
+            // If the end is not reached
+            return false;
+        }
+
+        void clear_visited() {
+            /** 
+             * Sets the visited attribute of all nodes to false.
+             */
+            for (std::vector<Node*> row : graph) {
+                for (Node* n : row) {
+                    n->visited = false;
+                }
+            }
         }
 
     private:
@@ -177,6 +227,8 @@ class Board {
                 graph.push_back(v);
             }
         }
+
+        
 
         void connect_nodes() {
             /**
@@ -202,15 +254,6 @@ class Board {
         }
 };
 
-std::ostream& operator<<(std::ostream& out, const Node* n) {
-    /** 
-     * Overloads the << operator to be able to print a node to the console. 
-     */
-    out << "Coordinates: (" << n->x << ", " << n->y << "), ";
-    out << "Color: " << n->color;
-    return out;    
-}
-
 void print_title() {
     std::cout << '\n';
     std::cout << "-----------------------------------------------------------------------\n";
@@ -225,14 +268,22 @@ int main() {
     Board* board = new Board(11);
     std::string user_color = "red";
     std::string cpu_color = "blue";
-    
+    bool winner = false;
+
     print_title();
     
     // Game Loop
     while (true) {
         board->print();
         board->get_user_move(user_color);
-        board->check_for_winner(user_color);
+        for (Node* n : board->graph.at(0)) {        
+            if (board->check_for_winner(n, user_color)) {
+                std::cout << "You win!";
+                winner = true;
+                break;
+            }
+        }
+        if (winner) break;
 //        if (!board->spaces_remain()) break;
 //        board->get_cpu_move(cpu_color);
 //        if (!board->spaces_remain()) break;
