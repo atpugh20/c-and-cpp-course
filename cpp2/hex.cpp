@@ -1,7 +1,7 @@
-/* 
-    Alexander Pugh
-
-    This program lets the user play the game called Hex.
+/** 
+* Alexander Pugh
+* 
+* This program lets the user play the game called Hex.
 */
 
 #include <iostream>
@@ -16,11 +16,14 @@ class Node {
      * A node is a space that a user can place a piece on. These 
      * nodes are connected to adjacent nodes through pointer references.
      */
+
     public:
         int x;
         int y;
-        std::string color;
         bool visited;
+        std::string color;
+        
+        // Adjacent Nodes
         Node* t_left;
         Node* t_right;
         Node* left;
@@ -29,9 +32,11 @@ class Node {
         Node* b_right;
         
         // Constructor
-        Node(int x, int y) : x(x), y(y), color("none"), visited(false), 
-                             t_left(nullptr), t_right(nullptr), left(nullptr),
-                             b_left(nullptr), b_right(nullptr), right(nullptr) {}
+        Node(int x, int y) : x(x), y(y), 
+                             color("none"), visited(false), 
+                             t_left(nullptr), t_right(nullptr), 
+                             left(nullptr), right(nullptr),
+                             b_left(nullptr), b_right(nullptr) {}
 }; 
 
 std::ostream& operator<<(std::ostream& out, const Node* n) {
@@ -45,20 +50,29 @@ std::ostream& operator<<(std::ostream& out, const Node* n) {
 
 class Board {
     /** 
-     * The board is an object that contains the full collection of nodes.
+     * The board is an object that contains the full collection of nodes. 
+     * The data for each node is stored in the 2D vector called "graph." 
      */
     public:
-        int size;
+        int size; // Board dimensions: size x size
         std::vector<std::vector<Node*>> graph;
     
         // Constructor
         Board(int size) : size(size) {
+            /**
+            * Fills the graph with the right number of nodes, 
+            * then connects these nodes together
+            */
             fill_nodes();
             connect_nodes();
         } 
 
         // Destructor
         ~Board() {
+            /** 
+             * Nodes are stored off the heap, so they are 
+             * deleted in the deconstructor
+             */
             for (std::vector<Node*> row : graph) {
                 for (Node* node : row) {
                     delete node;
@@ -126,6 +140,9 @@ class Board {
         }
 
         void get_cpu_move(std::string player_color) {
+            /**
+             * Uses std::rand() to get a random coordinate for the cpu
+             */
             int x;
             int y;
             while (true) {
@@ -134,19 +151,6 @@ class Board {
                 if (node_is_empty(x, y)) break;
             }
             graph.at(y).at(x)->color = player_color;
-        }
-
-        bool node_is_empty(int x, int y) {
-            /** 
-             * Checks if the node at the selected coordinates it empty. 
-             * If empty, return true. Otherwise, return false.
-             */
-            if (x >= 0 && y >= 0 && x < size && y < size) {
-                if (graph.at(y).at(x)->color == "none") {
-                    return true;
-                }
-            }
-            return false;
         }
 
         bool spaces_remain() {
@@ -163,55 +167,35 @@ class Board {
             return false;
         }
 
-        bool check_for_winner(Node* n, std::string color) {
-            if (n->color == color && !n->visited) {
-                n->visited = true;
-                
-                // Checks for the win conditions
-                if (n->color == "red" && n->y == size - 1) return true;
-                if (n->color == "blue" && n->x == size - 1) return true;
-                
-                // Checks the neighbor nodes
-                if (n->right->color == color &&
-                    !n->right->visited) {
-                    check_for_winner(n->right, color);
-                }
-                if (n->b_right->color == color &&
-                    !n->b_right->visited) {
-                    check_for_winner(n->b_right, color);
-                }
-                if (n->t_right->color == color &&
-                    !n->t_right->visited) {
-                    check_for_winner(n->t_right, color);
-                }
-                if (n->b_left->color == color &&
-                    !n->b_left->visited) {
-                    check_for_winner(n->b_left, color);
-                }
-                if (n->t_left->color == color &&
-                    !n->t_left->visited) {
-                    check_for_winner(n->t_left, color);
-                }
-                if (n->left->color == color &&
-                    !n->left->visited) {
-                    check_for_winner(n->left, color);
-                }
+        bool check_for_winner(std::string color) {
+            /** 
+             * Uses find_path on a side of the graph to see 
+             * if there is a winning path for the input color
+             * - Red is checked with row 0
+             * - Blue is checked with column 0
+             */
+            if (color == "red") {
+                for (Node* n : graph.at(0)) {
+                    clear_visited();
+                    if (find_path(n, color)) {
+                        print();
+                        std::cout << "Red wins!";
+                        return true;
+                    }
+                }                  
+            } else {
+                for (std::vector<Node*> row : graph) {        
+                    clear_visited();
+                    if (find_path(row.at(0), color)) {
+                        print();
+                        std::cout << "Blue wins!";
+                        return true;
+                    }
+                }         
             }
-            // If the end is not reached
             return false;
         }
-
-        void clear_visited() {
-            /** 
-             * Sets the visited attribute of all nodes to false.
-             */
-            for (std::vector<Node*> row : graph) {
-                for (Node* n : row) {
-                    n->visited = false;
-                }
-            }
-        }
-
+        
     private:
         void fill_nodes() {
             /**
@@ -228,7 +212,75 @@ class Board {
             }
         }
 
-        
+        bool node_is_empty(int x, int y) {
+            /** 
+             * Checks if the node at the selected coordinates it empty. 
+             * If empty, return true. Otherwise, return false.
+             */
+
+            if (x >= 0 && y >= 0 && x < size && y < size) {
+                if (graph.at(y).at(x)->color == "none") {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool find_path(Node* n, std::string color) {
+            /** 
+             * Starting from Node n, checks if there is a path from one 
+             * side of the board, to the opposing side of the board.
+             * Recursion is used to move from one node to another.
+             */
+            if (n->color == color && !n->visited) {
+                n->visited = true;
+                
+                // Checks for the win conditions
+                if (n->color == "red" && n->y == size - 1) return true;
+                if (n->color == "blue" && n->x == size - 1) return true;
+                
+                // Checks each of the neighbor nodes:
+                if (n->right != nullptr) {
+                    if (n->right->color == color &&
+                        !n->right->visited) {
+                        if (find_path(n->right, color)) return true;
+                    }
+                }
+                if (n->b_right != nullptr) {
+                    if (n->b_right->color == color &&
+                        !n->b_right->visited) {
+                        if (find_path(n->b_right, color)) return true;
+                    }
+                }
+                if (n->t_right != nullptr) {
+                    if (n->t_right->color == color &&
+                        !n->t_right->visited) {
+                        if (find_path(n->t_right, color)) return true;
+                        
+                    }
+                }
+                if (n->b_left != nullptr) {
+                    if (n->b_left->color == color &&
+                        !n->b_left->visited) {
+                        if (find_path(n->b_left, color)) return true;
+                    }
+                }
+                if (n->t_left != nullptr) {
+                    if (n->t_left->color == color &&
+                        !n->t_left->visited) {
+                        if (find_path(n->t_left, color)) return true;
+                    }
+                }
+                if (n->left != nullptr) {
+                    if (n->left->color == color &&
+                        !n->left->visited) {
+                        if (find_path(n->left, color)) return true;
+                    }
+                }
+            }
+            // If the end is not reached
+            return false;
+        }
 
         void connect_nodes() {
             /**
@@ -252,6 +304,18 @@ class Board {
                 }
             } 
         }
+
+        void clear_visited() {
+            /** 
+             * Sets the visited attribute of all nodes to false.
+             */
+            for (std::vector<Node*> row : graph) {
+                for (Node* n : row) {
+                    n->visited = false;
+                }
+            }
+        }
+
 };
 
 void print_title() {
@@ -268,28 +332,24 @@ int main() {
     Board* board = new Board(11);
     std::string user_color = "red";
     std::string cpu_color = "blue";
-    bool winner = false;
 
     print_title();
     
     // Game Loop
     while (true) {
         board->print();
+        
+        // User's turn
         board->get_user_move(user_color);
-        for (Node* n : board->graph.at(0)) {        
-            if (board->check_for_winner(n, user_color)) {
-                std::cout << "You win!";
-                winner = true;
-                break;
-            }
-        }
-        if (winner) break;
-//        if (!board->spaces_remain()) break;
-//        board->get_cpu_move(cpu_color);
-//        if (!board->spaces_remain()) break;
+        if (board->check_for_winner(user_color)) break;
+        if (!board->spaces_remain()) break;
+
+        // CPU's turn
+        board->get_cpu_move(cpu_color);
+        if (board->check_for_winner(cpu_color)) break;
+        if (!board->spaces_remain()) break;
     }
     
-    board->print();
     delete board;
     return 0;
 }
