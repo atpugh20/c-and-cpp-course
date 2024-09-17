@@ -1,19 +1,14 @@
 /** 
-* This program shows how virtual 
-* functions are used with inheritence
-* - Virtual functions are functions that 
-* - are declared in a base class and then 
-* - are redefined in a derived class
-*
+* This program shows the syntax used for class inheritence
 */
 
 #include <iostream>
-#include <string>
-#include <vector>
 #include <cmath>
 
 class Duo {
-    
+    /**
+     * This is the parent class
+     */ 
     public:
         Duo() : first(0.0), second(0.0) {}
         void set_first(double d) {first = d;}
@@ -21,11 +16,14 @@ class Duo {
         double get_first() {return first;}
         double get_second() {return second;}
     
-    protected: // can be used with inheritance
+    protected: // can be used with inheritance, when private cannot
         double first, second;
 };
 
 class Point:public Duo {
+    /**
+     * this is the child class
+     */
     public:
         double length() { return std::sqrt(first* first + second* second); }
 };
