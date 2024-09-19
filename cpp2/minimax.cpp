@@ -22,10 +22,8 @@ const int INF = 100000;
 int get_random() {
     /** 
     * Generates a random int between -5 and 5    
-    */
-    
-    int result = std::floor((static_cast<double>(std::rand()) / RAND_MAX) * 11 - 5); 
-        
+    */    
+    int result = std::floor((1.0 * std::rand() / RAND_MAX) * 11 - 5);   
     return result;
 }
 
@@ -71,7 +69,7 @@ int minimax(int choices, int depth, int alpha, int beta, bool maximizing_player)
 int main() {
     std::srand(std::time(0));
     const int choices = 2;
-    const int depth = 3;
+    const int depth = 4;
     
     std::cout << "\n---MINIMAX ALGORITHM---";
     std::cout << "\n\nBottom Nodes:\n\n";
@@ -79,5 +77,6 @@ int main() {
     int move = minimax(choices, depth, -INF, INF, true);
     
     std::cout << "\n\nBest Move:\n\n" << move << "\n\n";
+
     return 0;
 }
