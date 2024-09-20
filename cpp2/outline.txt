@@ -1,0 +1,19 @@
+
+
+Node
+- Label number
+- coordinates?
+- Connected nodes?
+
+Graph
+- Create nodes and edges
+    - Nodes should be static not dynamic
+	- 1 dimensional array based on the dimension of graph
+	
+- Methods:
+	- find_path()
+		- Union find algorithm (bidirectional from edges):w
+		
+
+
+
