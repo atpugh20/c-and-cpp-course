@@ -7,6 +7,14 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+
+inline int rand_int(int max) {
+    // Random int between 0 and max(exclusive)
+    return std::floor(std::rand() * 1.0 / RAND_MAX * max); 
+}
 
 class Node {
     /** 
@@ -105,6 +113,15 @@ class Board {
                 }
             }
         }
+
+        int simulate_moves(char current_player, char other_player) {
+            std::vector<Node> sim_graph;
+            sim_graph = graph;
+            for (int i = 0; i < sim_graph.size(); i++) {
+                    
+            }
+            return 0;
+        }
         
         void print() {
             /** 
@@ -130,7 +147,7 @@ class Board {
         inline void clear_visited() {
             for (int i = 0; i < side_len * side_len; i++) graph.at(i).visited = false;
         }
-        
+       
         bool find_path(char marker, int node_label) {
             /** 
             * Checks the node in the graph at index 'node_label'. If a full path from
@@ -160,17 +177,20 @@ class Board {
 };
 
 int main() {
+    std::srand(std::time(0));
     int side_len = 4;
     Board board(side_len);
     char user = 'X';
     char cpu = 'O';
 
+    board.simulate_moves(cpu, user);
+    
     // Game Loop
-    while (true) {
-        board.print();
-        board.get_user_move(user);
-        if (board.check_winner(user)) break;
-    }
+    // while (true) {
+    //     board.print();
+    //     board.get_user_move(user);
+    //     if (board.check_winner(user)) break;
+    // }
 
     return 0;
 }
