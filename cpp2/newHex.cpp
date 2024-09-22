@@ -233,17 +233,20 @@ class Board {
         }
 };
 
-void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_score) {
+void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_score,
+                   int& x_wins, int& o_wins, int& user_x_wins, int& user_x_losses) {
     char user = 'X';
     char cpu = 'O';
     while (true) {
 
         // User Move
         board.print();
-        board.get_user_move(user);
-        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        // board.get_user_move(user);
+        board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
         if (board.check_winner(user, &board.graph)) { 
             user_score++;
+            user_x_wins++;
+            x_wins++;
             break;
         }
         if (board.is_full()) break;
@@ -253,13 +256,17 @@ void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_sc
         board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
         if (board.check_winner(cpu, &board.graph)) {
             cpu_score++;
+            user_x_losses++;
+            o_wins++;
             break;
         }
         if (board.is_full()) break;
     }
+    board.print();
 }
 
-void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_score) {
+void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_score,
+                   int& x_wins, int& o_wins, int& user_o_wins, int& user_o_losses) {
     char user = 'O';
     char cpu = 'X';
 
@@ -269,6 +276,8 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
         board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
         if (board.check_winner(cpu, &board.graph)) {
             cpu_score++;
+            user_o_losses++;
+            x_wins++;
             break;
         }
         if (board.is_full()) break;
@@ -276,47 +285,66 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
         
 
         // User Move
-        board.get_user_move(user);
-        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        // board.get_user_move(user);
+        board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
         if (board.check_winner(user, &board.graph)) { 
             user_score++;
+            user_o_wins++;
+            o_wins++;
             break;
         }
         if (board.is_full()) break;
-        board.print();        
+        board.print();
     }
+    board.print();
 }
 
 int main() {
     std::srand(std::time(0));
 
     int side_len = 5;
-    int number_of_sims = 100;
+    int number_of_sims = 1000;
+    int score_limit = 25;
 
     char user = 'X';
     char cpu = 'O';
     int user_score = 0;
     int cpu_score = 0;
+    int x_wins = 0;
+    int o_wins = 0;
+    int user_x_wins = 0;
+    int user_o_wins = 0;
+    int user_x_losses = 0;
+    int user_o_losses = 0;
 
     Board board(side_len);
     
     // Game Loop
-    while (user_score < 25 && cpu_score < 25) {
+    while (user_score < score_limit && cpu_score < score_limit) {
         
         // Round Loop
         if (user == 'X') {
-            play_hex_as_x(board, number_of_sims, user_score, cpu_score);
+            play_hex_as_x(board, number_of_sims, user_score, cpu_score, x_wins, o_wins,
+                          user_x_wins, user_x_losses);
         } else {
-            play_hex_as_o(board, number_of_sims, user_score, cpu_score);
+            play_hex_as_o(board, number_of_sims, user_score, cpu_score, x_wins, o_wins,
+                          user_o_wins, user_o_losses);
         }
 
-        // End of round
-        board.print();
-        board.clear();
+        // End of round / Scoreboard
         std::cout << "User score: " << user_score << '\n';
         std::cout << "CPU Score: " << cpu_score << '\n';
+       
         std::swap(user, cpu); // Switch Sides
     }
+
+    std::cout << "\nStatistics:\n";
+    std::cout << "Total X wins: " << x_wins << '\n';
+    std::cout << "Total O wins: " << o_wins << '\n';
+    std::cout << "\nUser Statistics:\n";
+    std::cout << "X record: " << user_x_wins << " - " << user_x_losses << '\n';
+    std::cout << "O record: " << user_o_wins << " - " << user_o_losses << "\n\n\n";
+    std::cout << "\n\nThank you for playing!\n\n";
 
     return 0;
 }
