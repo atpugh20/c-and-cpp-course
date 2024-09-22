@@ -1,23 +1,19 @@
 #include <vector>
 #include <iostream> 
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
 
 int main() {
-
-    std::vector<int> nums;
-
-    for (int i = 0; i < 10; i++) {
-        nums.push_back(i);
+    std::srand(std::time(0));
+    int n = 0;
+    for (int j = 0; j < 100; j++) {
+        for (int i = 0; i < 1000000; i++) {
+            n = std::floor(std::rand() / (RAND_MAX + 1.0) * 121);
+            std::cout << n << ' ';
+            if (n == 121) std::cout << "yes";
+        }
     }
-    for (int n : nums) {
-        std::cout << n << " ";
-    }
-
-    for (int i = 0; i < 10; i++) {
-        nums.at(i) = 0;
-    }
-    for (int n : nums) {
-        std::cout << n << " ";
-    }
-
+    
     return 0;
 }

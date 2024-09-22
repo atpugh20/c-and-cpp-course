@@ -10,10 +10,11 @@
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
+#include <array>
 
 inline int rand_int(int max) {
     // Random int between 0 and max(exclusive)
-    return std::floor(std::rand() * 1.0 / RAND_MAX * max); 
+    return std::floor(std::rand() / (RAND_MAX + 1.0) * max); 
 }
 
 class Node {
@@ -67,14 +68,22 @@ class Board {
 
         std::vector<Node> graph;
         int side_len;
+        int node_num;
 
-        Board(int side_len) : side_len(side_len) {
-            for (int i = 0; i < side_len * side_len; i++) {
+        Board(int side_len) : side_len(side_len), node_num(side_len * side_len) {
+            for (int i = 0; i < node_num; i++) {
                 graph.push_back(Node(i, side_len));        
             }        
         }
 
-        bool check_winner(char marker) {
+        void clear() {
+            clear_visited(&graph);
+            for (int i = 0; i < graph.size(); i++) {
+                graph.at(i).marker = ' ';
+            }
+        }
+
+        bool check_winner(char marker, std::vector<Node>* g) {
             /** 
             * Finds a starting wall for the player being checked, then tries to find
             * a path to the opposite wall by calling find_path() 
@@ -82,15 +91,11 @@ class Board {
 
             int interval = 1;
             if (marker == 'O') interval = side_len;
-            clear_visited();
+            clear_visited(g);
 
             // Begin check from the player's start wall
             for (int i = 0; i < interval * side_len; i+=interval) {
-                if(find_path(marker, i)) {
-                    print();
-                    std::cout << marker << " wins!\n\n";
-                    return true;
-                }
+                if(find_path(marker, i, g)) return true;
             }            
             return false;
         }
@@ -114,13 +119,58 @@ class Board {
             }
         }
 
-        int simulate_moves(char current_player, char other_player) {
+        int simulate_moves(int sim_num, char current_player, char other_player) {
             std::vector<Node> sim_graph;
-            sim_graph = graph;
-            for (int i = 0; i < sim_graph.size(); i++) {
-                    
+            std::vector<Node> sim_graph_t;
+            std::vector<int> rates(node_num);
+            std::fill(rates.begin(), rates.end(), 0);
+            char cp = current_player;
+            int r_index;
+            int wins;
+            int empty_nodes = -1;
+
+            // Get the number of empty nodes
+            for (Node n : graph) if(n.marker == ' ') empty_nodes++;
+
+            // Run simulations with every potential move that can be made
+            for (int i = 0; i < node_num; i++) {
+                if (graph.at(i).marker != ' ') continue; // If the current node is not empty, skip it
+                sim_graph_t = graph;
+                sim_graph_t.at(i).marker = current_player;              
+                wins = 0;
+
+                // Simulate 'sim_num' games with the move 
+                for (int j = 0; j < sim_num; j++) {
+                    sim_graph = sim_graph_t;
+
+                    // Randomly fill in every space, alternating cpu and user
+                    for (int k = 0; k < empty_nodes; k++) {
+                        while (true) { 
+                            r_index = rand_int(node_num);
+                            if(sim_graph.at(r_index).marker == ' ') {
+                                sim_graph.at(r_index).marker = current_player;
+                                break;
+                            } 
+                        }
+                        std::swap(current_player, other_player);
+                    }
+
+                    // Increment over wins when the cpu won with the move
+                    if (check_winner(cp, &sim_graph)) wins++;
+                }
+                rates.at(i) = wins;
             }
-            return 0;
+
+            // Return the move with the most wins
+            int b_index = 0;
+            int biggest = 0;
+            for (int i = 0; i < rates.size(); i++) {
+                if (rates.at(i) > biggest) {
+                    biggest = rates.at(i);
+                    b_index = i;
+                }
+            }
+            return b_index;
         }
         
         void print() {
@@ -142,19 +192,26 @@ class Board {
             std::cout << "\n\n";
         }
 
+        bool is_full() {
+            for (Node n : graph) if (n.marker == ' ') return false;
+            return true;
+        }
+
     private:
 
-        inline void clear_visited() {
-            for (int i = 0; i < side_len * side_len; i++) graph.at(i).visited = false;
+        inline void clear_visited(std::vector<Node>* g) {
+            for (int i = 0; i < node_num; i++) g->at(i).visited = false;
         }
+
+        
        
-        bool find_path(char marker, int node_label) {
+        bool find_path(char marker, int node_label, std::vector<Node>* g) {
             /** 
             * Checks the node in the graph at index 'node_label'. If a full path from
             * one wall to another has been reached, return true. If not, return false.
             * This is called recursively to check adjacent nodes.  
             */
-            Node* n = &graph.at(node_label);
+            Node* n = &g->at(node_label);
 
             // Check if the node has the right marker and is unvisited
             if (n->marker == marker && !n->visited) {
@@ -165,32 +222,101 @@ class Board {
                 if (n->marker == 'O' && n->x == side_len - 1) return true;
 
                 // Check each adjacent node
-                if (n->right != -1) if (find_path(marker, n->right)) return true;
-                if (n->b_right != -1) if (find_path(marker, n->b_right)) return true;
-                if (n->t_right != -1) if (find_path(marker, n->t_right)) return true;
-                if (n->left != -1) if (find_path(marker, n->left)) return true;
-                if (n->b_left != -1) if (find_path(marker, n->b_left)) return true;
-                if (n->t_left != -1) if (find_path(marker, n->t_left)) return true;
+                if (n->right != -1) if (find_path(marker, n->right, g)) return true;
+                if (n->b_right != -1) if (find_path(marker, n->b_right, g)) return true;
+                if (n->t_right != -1) if (find_path(marker, n->t_right, g)) return true;
+                if (n->left != -1) if (find_path(marker, n->left, g)) return true;
+                if (n->b_left != -1) if (find_path(marker, n->b_left, g)) return true;
+                if (n->t_left != -1) if (find_path(marker, n->t_left, g)) return true;
             }
             return false;
         }
 };
 
-int main() {
-    std::srand(std::time(0));
-    int side_len = 4;
-    Board board(side_len);
+void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_score) {
     char user = 'X';
     char cpu = 'O';
+    while (true) {
 
-    board.simulate_moves(cpu, user);
+        // User Move
+        board.print();
+        board.get_user_move(user);
+        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        if (board.check_winner(user, &board.graph)) { 
+            user_score++;
+            break;
+        }
+        if (board.is_full()) break;
+    
+        // CPU Move
+        board.print();
+        board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
+        if (board.check_winner(cpu, &board.graph)) {
+            cpu_score++;
+            break;
+        }
+        if (board.is_full()) break;
+    }
+}
+
+void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_score) {
+    char user = 'O';
+    char cpu = 'X';
+
+    while (true) {
+        
+        // CPU Move
+        board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
+        if (board.check_winner(cpu, &board.graph)) {
+            cpu_score++;
+            break;
+        }
+        if (board.is_full()) break;
+        board.print();
+        
+
+        // User Move
+        board.get_user_move(user);
+        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        if (board.check_winner(user, &board.graph)) { 
+            user_score++;
+            break;
+        }
+        if (board.is_full()) break;
+        board.print();        
+    }
+}
+
+int main() {
+    std::srand(std::time(0));
+
+    int side_len = 5;
+    int number_of_sims = 100;
+
+    char user = 'X';
+    char cpu = 'O';
+    int user_score = 0;
+    int cpu_score = 0;
+
+    Board board(side_len);
     
     // Game Loop
-    // while (true) {
-    //     board.print();
-    //     board.get_user_move(user);
-    //     if (board.check_winner(user)) break;
-    // }
+    while (user_score < 25 && cpu_score < 25) {
+        
+        // Round Loop
+        if (user == 'X') {
+            play_hex_as_x(board, number_of_sims, user_score, cpu_score);
+        } else {
+            play_hex_as_o(board, number_of_sims, user_score, cpu_score);
+        }
+
+        // End of round
+        board.print();
+        board.clear();
+        std::cout << "User score: " << user_score << '\n';
+        std::cout << "CPU Score: " << cpu_score << '\n';
+        std::swap(user, cpu); // Switch Sides
+    }
 
     return 0;
 }
