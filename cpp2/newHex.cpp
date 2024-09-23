@@ -1,6 +1,7 @@
 /**
 * This program lets the user play the game called Hex. This version of
 * the program is optimized to play more efficiently than the original.
+* The CPU uses the Monte Carlo method to determine its next move. 
 */
 
 #include <iostream>
@@ -63,7 +64,6 @@ class Board {
     /** 
     * The board contains all the nodes and methods used for gameplay.
     */
-    
     public:
 
         std::vector<Node> graph;
@@ -77,6 +77,9 @@ class Board {
         }
 
         void clear() {
+            /** 
+            * Wipes the board of all markers
+            */
             clear_visited(&graph);
             for (int i = 0; i < graph.size(); i++) {
                 graph.at(i).marker = ' ';
@@ -114,12 +117,19 @@ class Board {
                     graph.at(index).marker = marker;
                     break;
                 } else {
-                    std::cout << "\nInvalid space!\n";
+                    std::cout << "\nInvalid space!";
+                    std::cout << std::endl;
                 }
             }
         }
 
         int simulate_moves(int sim_num, char current_player, char other_player) {
+            /** 
+            * Simulates 'sim_num' matches for each move that can be made on the current
+            * turn. The node label with the most simulated wins will be returned. This
+            * The more simulations, the better the move will be.
+            * This function is used to determine the CPU's next move.  
+            */
             std::vector<Node> sim_graph;
             std::vector<Node> sim_graph_t;
             std::vector<int> rates(node_num);
@@ -193,6 +203,9 @@ class Board {
         }
 
         bool is_full() {
+            /** 
+            * Checks if the the board is full of markers
+            */
             for (Node n : graph) if (n.marker == ' ') return false;
             return true;
         }
@@ -203,8 +216,6 @@ class Board {
             for (int i = 0; i < node_num; i++) g->at(i).visited = false;
         }
 
-        
-       
         bool find_path(char marker, int node_label, std::vector<Node>* g) {
             /** 
             * Checks the node in the graph at index 'node_label'. If a full path from
@@ -235,14 +246,19 @@ class Board {
 
 void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_score,
                    int& x_wins, int& o_wins, int& user_x_wins, int& user_x_losses) {
+    /**
+    * Plays the round loop with the user as the 'X' player, who moves first.
+    */
     char user = 'X';
     char cpu = 'O';
+    std::cout << "\nYou are 'X', the first move. \nCreate a path from the TOP wall to the BOTTOM wall to win!\n";
+    
     while (true) {
 
         // User Move
         board.print();
-        // board.get_user_move(user);
-        board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        board.get_user_move(user);
+        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
         if (board.check_winner(user, &board.graph)) { 
             user_score++;
             user_x_wins++;
@@ -253,6 +269,7 @@ void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_sc
     
         // CPU Move
         board.print();
+        std::cout << "CPU selecting move...\n\n";
         board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
         if (board.check_winner(cpu, &board.graph)) {
             cpu_score++;
@@ -267,12 +284,18 @@ void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_sc
 
 void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_score,
                    int& x_wins, int& o_wins, int& user_o_wins, int& user_o_losses) {
+    /** 
+    * Plays the round loop with the user as the 'O' player, who moves second.
+    */
     char user = 'O';
     char cpu = 'X';
+    std::cout << "\nYou are 'O', the second move. \nCreate a path from the LEFT wall to the RIGHT wall to win!\n";
 
     while (true) {
         
         // CPU Move
+        std::cout << std::endl;
+        std::cout << "CPU selecting move...\n\n";
         board.graph.at(board.simulate_moves(number_of_sims, cpu, user)).marker = cpu;
         if (board.check_winner(cpu, &board.graph)) {
             cpu_score++;
@@ -285,8 +308,8 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
         
 
         // User Move
-        // board.get_user_move(user);
-        board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
+        board.get_user_move(user);
+        // board.graph.at(board.simulate_moves(number_of_sims, user, cpu)).marker = user;
         if (board.check_winner(user, &board.graph)) { 
             user_score++;
             user_o_wins++;
@@ -302,12 +325,13 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
 int main() {
     std::srand(std::time(0));
 
-    int side_len = 5;
+    int side_len = 11;
     int number_of_sims = 1000;
-    int score_limit = 25;
+    // int score_limit = 25;
 
     char user = 'X';
     char cpu = 'O';
+    char play_again = 'y';
     int user_score = 0;
     int cpu_score = 0;
     int x_wins = 0;
@@ -320,9 +344,11 @@ int main() {
     Board board(side_len);
     
     // Game Loop
-    while (user_score < score_limit && cpu_score < score_limit) {
+    while (play_again != 'n' && play_again != 'N') {
         
         // Round Loop
+        std::cout << "\n-----------------------------------------------------------\n";
+        std::cout << "\nRound " << user_score + cpu_score + 1 << ":\n";
         if (user == 'X') {
             play_hex_as_x(board, number_of_sims, user_score, cpu_score, x_wins, o_wins,
                           user_x_wins, user_x_losses);
@@ -333,18 +359,22 @@ int main() {
 
         // End of round / Scoreboard
         std::cout << "User score: " << user_score << '\n';
-        std::cout << "CPU Score: " << cpu_score << '\n';
-       
+        std::cout << "CPU Score: " << cpu_score << "\n\n";
+        std::cout << "Would you like to play again? (Y/n): ";
+        std::cin >> play_again;
+        std::cout << std::endl;
+        
         std::swap(user, cpu); // Switch Sides
     }
 
+    // End of game!
     std::cout << "\nStatistics:\n";
     std::cout << "Total X wins: " << x_wins << '\n';
     std::cout << "Total O wins: " << o_wins << '\n';
     std::cout << "\nUser Statistics:\n";
     std::cout << "X record: " << user_x_wins << " - " << user_x_losses << '\n';
     std::cout << "O record: " << user_o_wins << " - " << user_o_losses << "\n\n\n";
-    std::cout << "\n\nThank you for playing!\n\n";
+    std::cout << "Thank you for playing!\n\n";
 
     return 0;
 }
