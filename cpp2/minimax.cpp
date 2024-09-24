@@ -22,15 +22,9 @@ const int INF {100000};
 int get_random() {
     /** 
     * Generates a random int between -5 and 5    
-<<<<<<< Updated upstream
     */    
-    int result = std::floor((1.0 * std::rand() / RAND_MAX) * 11 - 5);   
-=======
-    */
-    
-    int result = std::floor((static_cast<double>(std::rand()) / RAND_MAX) * 11 - 5); 
+    int result = std::floor((1.0 * std::rand() / RAND_MAX) * 11 - 5);       
     if (result == 6 || result == -6) std::cout << "\nGot 6/-6\n";
->>>>>>> Stashed changes
     return result;
 }
 
@@ -75,13 +69,8 @@ int minimax(int choices, int depth, int alpha, int beta, bool maximizing_player)
 
 int main() {
     std::srand(std::time(0));
-<<<<<<< Updated upstream
-    const int choices = 2;
-    const int depth = 4;
-=======
     const int choices {2};
     const int depth {3};
->>>>>>> Stashed changes
     
     std::cout << "\n---MINIMAX ALGORITHM---";
     std::cout << "\n\nBottom Nodes:\n\n";
