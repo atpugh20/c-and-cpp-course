@@ -5,13 +5,11 @@
 */
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
 #include <cmath>
-#include <array>
 
 inline int rand_int(int max) {
     // Random int between 0 and max(exclusive)
@@ -92,7 +90,7 @@ class Board {
             * a path to the opposite wall by calling find_path() 
             */
 
-            int interval = 1;
+            int interval {1};
             if (marker == 'O') interval = side_len;
             clear_visited(g);
 
@@ -134,10 +132,10 @@ class Board {
             std::vector<Node> sim_graph_t;
             std::vector<int> rates(node_num);
             std::fill(rates.begin(), rates.end(), 0);
-            char cp = current_player;
+            char cp {current_player};
             int r_index;
             int wins;
-            int empty_nodes = -1;
+            int empty_nodes {-1};
 
             // Get the number of empty nodes
             for (Node n : graph) if(n.marker == ' ') empty_nodes++;
@@ -172,8 +170,8 @@ class Board {
             }
 
             // Return the move with the most wins
-            int b_index = 0;
-            int biggest = 0;
+            int b_index {0};
+            int biggest {0};
             for (int i = 0; i < rates.size(); i++) {
                 if (rates.at(i) > biggest) {
                     biggest = rates.at(i);
@@ -187,7 +185,7 @@ class Board {
             /** 
             * Prints the board to the console
             */
-            int counter = 0;
+            int counter {0};
             std::cout << "\n  ";
             for (int i = 0; i < side_len; i++) std::cout << ' ' << i << "  ";
             for (Node n : graph) {
@@ -222,7 +220,7 @@ class Board {
             * one wall to another has been reached, return true. If not, return false.
             * This is called recursively to check adjacent nodes.  
             */
-            Node* n = &g->at(node_label);
+            Node* n {&g->at(node_label)};
 
             // Check if the node has the right marker and is unvisited
             if (n->marker == marker && !n->visited) {
@@ -249,8 +247,8 @@ void play_hex_as_x(Board board, int number_of_sims, int& user_score, int& cpu_sc
     /**
     * Plays the round loop with the user as the 'X' player, who moves first.
     */
-    char user = 'X';
-    char cpu = 'O';
+    char user {'X'};
+    char cpu {'O'};
     std::cout << "\nYou are 'X', the first move. \nCreate a path from the TOP wall to the BOTTOM wall to win!\n";
     
     while (true) {
@@ -287,8 +285,8 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
     /** 
     * Plays the round loop with the user as the 'O' player, who moves second.
     */
-    char user = 'O';
-    char cpu = 'X';
+    char user {'O'};
+    char cpu {'X'};
     std::cout << "\nYou are 'O', the second move. \nCreate a path from the LEFT wall to the RIGHT wall to win!\n";
 
     while (true) {
@@ -325,21 +323,16 @@ void play_hex_as_o(Board board, int number_of_sims, int& user_score, int& cpu_sc
 int main() {
     std::srand(std::time(0));
 
-    int side_len = 11;
-    int number_of_sims = 1000;
+    const int side_len {11};
+    const int number_of_sims {1000};
     // int score_limit = 25;
 
-    char user = 'X';
-    char cpu = 'O';
-    char play_again = 'y';
-    int user_score = 0;
-    int cpu_score = 0;
-    int x_wins = 0;
-    int o_wins = 0;
-    int user_x_wins = 0;
-    int user_o_wins = 0;
-    int user_x_losses = 0;
-    int user_o_losses = 0;
+    char user {'X'};
+    char cpu = {'O'};
+    char play_again {'y'};
+    int user_score {0}, cpu_score {0};
+    int x_wins {0}, o_wins {0};
+    int user_x_wins {0}, user_o_wins {0}, user_x_losses {0}, user_o_losses {0};
 
     Board board(side_len);
     
