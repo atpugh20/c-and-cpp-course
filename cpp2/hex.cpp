@@ -329,8 +329,8 @@ void print_title() {
 int main() {
     std::srand(std::time(0));
     Board* board = new Board(11);
-    std::string user_color = "red";
-    std::string cpu_color = "blue";
+    std::string user_color {"red"};
+    std::string cpu_color {"blue"};
 
     print_title();
     

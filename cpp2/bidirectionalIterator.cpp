@@ -3,7 +3,7 @@
 
 // Bidirectional Iterator
 bool is_palindrome(std::string word){
-    int start = 0;
+    int start {0};
     int end = word.size() - 1;
 
     while (true) {
@@ -15,7 +15,7 @@ bool is_palindrome(std::string word){
         start++; end--;
         if (start > end) break;
     }
-    std::cout << "Is a palindrome!";
+    std::cout << "Is a palindrome!" << std::endl;
     return true;
 }
 

@@ -6,7 +6,6 @@
  */
 
 #include <iostream>
-#include <string>
 #include <vector>
 #include <algorithm>
 
@@ -14,6 +13,7 @@ int main() {
     std::vector<int> nums;
     for (int i = 0; i < 100; i++) nums.push_back(i);
 
+    // Lambda used in this for_each:
     for_each(nums.begin(), nums.end(), [](int i){
         std::cout << i << '\n';
     });

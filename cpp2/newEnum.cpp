@@ -23,7 +23,7 @@ std::ostream& operator<<(std::ostream& out, const Response& r) {
 }
 
 int main() {
-    Response r = Response::YES;
+    Response r {Response::YES};
     std::cout << r << " - " << int(r) << '\n';
     r = Response::MAYBE;
     std::cout << r << " - " << int(r) << '\n';

@@ -16,7 +16,7 @@ int main() {
     positions["SMG1"] = "Bryce";
     positions["SMG2"] = "Chase";
 
-    unsigned total_pay = 0;
+    unsigned total_pay{ 0 };
 
     worker[99567800] = "Alfredo Abromaitis";
     payroll[99567800] = 100000;
